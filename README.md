@@ -77,6 +77,7 @@ uv add --script example.py requests
 
 # run the script in an isolated virtual environment
 uv run example.py
+uv run python main.py      # note that `uv run python example.py` may give an error as it doesn't support inline dependencies
 
 # remove a dependency from a script
 uv remove --script example.py requests
@@ -161,9 +162,67 @@ uv pip compile docs/requirements.in \
 
 # install the locked requirements
 uv pip sync docs/requirements.txt
-
-
 ```
+
+## Build amd publish
+
+Build wheels & source distributions:
+```bash
+uv build
+```
+
+Publish to PyPI:
+```bash
+uv publish
+```
+
+## Example Project: FastAPI App with `uv`
+
+### Step 1 — Initialize Project
+
+```bash
+mkdir myfastapi && cd myfastapi
+uv init --app
+```
+
+### Step 2 — Add Dependencies
+
+```bash
+uv add fastapi uvicorn
+uv add --dev pytest black ruff
+```
+
+Step 3 — Create FastAPI App
+
+```bash
+mkdir app
+touch app/main.py
+```
+
+```python
+"""main.py"""
+from fastapi import FastAPI
+
+app = FastAPI()
+@app.get("/")
+async def root():
+   return {"message": "Hello from uv + FastAPI!"}
+```
+
+### Step 4 — Lock & Sync
+
+```bash
+uv lock
+uv sync
+```
+
+### Step 5 — Run the API
+
+```bash
+uv run uvicorn app.main:app --reload --port 8000
+```
+
 ## Reference
 1. [uv docs](https://docs.astral.sh/uv/)
 2. [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/#docker)
+3. [UV in Python: The Fastest Package & Project Manager (Complete Guide + Example Project)](https://blog.stackademic.com/uv-in-python-the-fastest-package-project-manager-complete-guide-example-project-91e6a6048e80)
